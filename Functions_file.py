@@ -3,12 +3,63 @@ import numpy as np
 import pandas as pd
 import string
 import random
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# from scipy.stats import pearsonr
 
 
 def load_data(file):
     data = pd.read_csv(file)
 
     return data
+
+
+# Define a function for Pearson Correlation from first principles
+def my_pearsonr(x,y):
+    mean_x = np.mean(x)
+    mean_y = np.mean(y)
+    numerator=np.sum((x-mean_x)*(y-mean_y))
+    denominator=(np.sum((x-mean_x)**2) * np.sum((y-mean_y)**2))**0.5
+    return numerator / denominator, None
+
+
+# Function to identify which features to drop
+def get_correlated_features(corr, treshold):
+    feature_list = []
+    cols = corr.columns.size
+    # print('Correlated Features:')
+    for i in range(cols):
+        for j in range(i+1, cols):
+            if corr.iloc[i, j] > treshold:
+                feature_list.append((i,j))
+                # print(corr.columns[i] + ' <--> ' + corr.columns[j])
+    return np.array(feature_list)
+
+
+def feature_selection(data, correlation_threshold):
+    # Load the dataset and seperate the target colum
+    original_dataset = data
+    target = data['Absenteeism time in hours']
+    data = data.drop('Absenteeism time in hours', axis=1)
+
+    # Calculate the feature correlation
+    cols = data.columns.size
+    relations = np.zeros((cols, cols))
+
+    for i in range(cols):
+        for j in range(i, cols):
+            a, _ = my_pearsonr(data.iloc[:, i], data.iloc[:, j])
+            b, _ = my_pearsonr(data.iloc[:, j], data.iloc[:, i])
+            relations[i, j] = a
+            relations[j, i] = b
+    corr = pd.DataFrame(data=relations, index=data.columns, columns=data.columns)
+
+    to_drop = get_correlated_features(corr, correlation_threshold)
+    for x in to_drop[:, 0]:
+        # print('Dropping feature: ' + corr.columns[x])
+        original_dataset = original_dataset.drop(corr.columns[x], axis=1)
+
+    return original_dataset
 
 
 def output_data(data, path, filename):
