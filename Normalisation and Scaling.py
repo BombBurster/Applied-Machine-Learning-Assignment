@@ -12,26 +12,32 @@ def load_data(file):
     return data
 
 
-def column_to_categorical(data, column):
-    minimum = data[column].min()
-    maximum = data[column].max()
-    minimum = float(minimum)
-    maximum = float(maximum)
-    # print(minimum)
-    # print(maximum)
+# groups are considered as follows:
+# example [0,5,10]: x<0 = 0, 0<x>5 = 1, 5<x>10 = 2, x>10 = 3
+def column_to_categorical(data, column, groups):
+    length = len(groups)
+
     for index, row in data.iterrows():
         s = data.xs(index)
         column_i = s[column]
-        print('old', s[column])
-        if float(column_i) <= (maximum / 3):
-            data.at[index, column] = 0  # low
-        elif float(column_i) <= (2 * (maximum / 3)):
-            data.at[index, column] = 0.5  # medium
-        elif float(column_i) > (2 * (maximum / 3)):
-            data.at[index, column] = 1  # high
-        else:
-            Exception('Out of range')
-        print('new', data.at[index, column])
+        # print('old', s[column])
+        j = 0
+        for val in groups:
+            if j is 0:
+                if float(column_i) <= float(val):
+                    data.at[index, column] = j
+            elif (j > 0) and (j < (length-1)):
+                if (float(column_i) <= float(val)) and (float(column_i) > float(groups[j - 1])):
+                    data.at[index, column] = j
+            elif j is (length-1):
+                if (float(column_i) <= float(val)) and (float(column_i) > float(groups[j - 1])):
+                    data.at[index, column] = j
+                elif float(column_i) > float(val):
+                    data.at[index, column] = j + 1
+            else:
+                print("Categorization Error")
+            j += 1
+        # print('new', data.at[index, column])
 
     return data
 
@@ -103,13 +109,16 @@ def scale(data, features):
 try:
     dataset = load_data('Absenteeism_at_work.csv')
     print(dataset)
-    # dataset = column_to_categorical(dataset, 'Absenteeism time in hours')
+    dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 5, 10])
+    print(dataset)
     dataset = scale(dataset, dataset.keys())
     print(dataset)
     dataset = load_data('Absenteeism_at_work.csv')
+    dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 5, 10])
     dataset = normalize(dataset, dataset.keys())
     print(dataset)
     dataset = load_data('Absenteeism_at_work.csv')
+    dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 5, 10])
     dataset = normalize_z_score(dataset, dataset.keys())
     print(dataset)
 except Exception as inst:
