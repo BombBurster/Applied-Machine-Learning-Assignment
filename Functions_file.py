@@ -36,8 +36,8 @@ def get_correlated_features(corr, treshold):
     return np.array(feature_list)
 
 
-def feature_selection(data, correlation_threshold):
-    # Load the dataset and seperate the target colum
+def feature_selection(data, correlation_threshold=0.6):
+    # Load the dataset and seperate the target column
     original_dataset = data
     target = data['Absenteeism time in hours']
     data = data.drop('Absenteeism time in hours', axis=1)
@@ -60,6 +60,45 @@ def feature_selection(data, correlation_threshold):
         original_dataset = original_dataset.drop(corr.columns[x], axis=1)
 
     return original_dataset
+
+
+# Calcuate the covariance matrix
+def my_cov(df, X):
+    return np.dot(X, X.T)/df.shape[1]
+
+
+def principle_component_analysis(data, threshold=0.9):
+    # Load the dataset and seperate the target column
+    original_dataset = data
+    target = data['Absenteeism time in hours']
+    data = data.drop('Absenteeism time in hours', axis=1)
+
+    # normalize the data
+    normalized_data = normalize(data, data.keys())
+
+    # transpose the normalized data and comput the covariance matrix
+    X_t = normalized_data.T
+    covariance_matrix = my_cov(data, X_t)
+
+    # Compute the Eigen values and vectors
+    U, S, V = np.linalg.svd(covariance_matrix)
+
+    K = 1
+    while True:
+        preserve = np.sum(S[0:K]) / np.sum(S)
+        if (preserve >= threshold):
+            break
+        K += 1
+
+    # Compute the Principle Components
+    pca_x = np.dot(data, V)
+    # Drop the unwanted components
+    pca_x = pca_x[:, 0:K]
+
+    # Change to pandas
+    pca_result = pd.DataFrame(data=pca_x, columns=data.keys()[0:K])
+    pca_result['Absenteeism time in hours'] = target
+    return pca_result
 
 
 def output_data(data, path, filename):

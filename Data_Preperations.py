@@ -7,23 +7,18 @@ path = "./Absenteeism/"
 
 
 try:
+    # feature selection, pca, normalization and scaling
     dataset = load_data(path+'Absenteeism_at_work.csv')
     print(dataset)
     dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 5, 10])
     dataset = feature_selection(dataset, 0.6)
+    dataset = principle_component_analysis(dataset, 0.9)
+    dataset = normalize(dataset, dataset.keys())
     dataset = scale(dataset, dataset.keys())
+
+    # output to a csv file
+    output_data(dataset, path, 'Absenteeism_at_work_editted')
     print(dataset)
-    # dataset = load_data(path+'Absenteeism_at_work.csv')
-    # dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 5, 10])
-    # dataset = normalize(dataset, dataset.keys())
-    # print(dataset)
-    # dataset = load_data(path+'Absenteeism_at_work.csv')
-    # dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 5, 10])
-    # dataset = normalize_z_score(dataset, dataset.keys())
-    # print(dataset)
-    # y_test, x_test, y_train, x_train = split_data(0.8, dataset, 'Absenteeism time in hours')
-    # print(y_test, '\n\n', x_test)
-    # output_data(dataset, path, 'Absenteeism_at_work_editted')
 except Exception as inst:
     print(type(inst))
     print('Error has occured: ' + inst.args)
