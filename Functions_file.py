@@ -1,15 +1,47 @@
-import pickle
 import os
 import numpy as np
 import pandas as pd
-
-path = "./Absenteeism/"
+import string
+import random
 
 
 def load_data(file):
-    data = pd.read_csv(path+file)
+    data = pd.read_csv(file)
 
     return data
+
+
+def output_data(data, path, filename):
+    if filename != '':
+        if filename.find('.csv') is True:
+            data.to_csv(path+filename, index=None, header=True)
+        else:
+            data.to_csv(path+filename+'.csv', index=None, header=True)
+    else:
+        print('No filename entered')
+
+
+# function to split the data into test set and training set
+def split_data(split, dataset, Y_column_name=0):
+    training_set = pd.DataFrame()
+    test_set = pd.DataFrame()
+    for index, row in dataset.iterrows():
+        s = dataset.xs(index)
+        if random.random() < split:
+            training_set = training_set.append(s, ignore_index=True)
+        else:
+            test_set = test_set.append(s, ignore_index=True)
+
+    if Y_column_name is 0:
+        return test_set, training_set
+    else:
+        Y_test_set = test_set[Y_column_name]
+        Y_test_set = Y_test_set.rename(Y_column_name, axis='columns')
+        X_test_set = test_set.drop(Y_column_name, axis=1)
+        Y_training_set = training_set[Y_column_name]
+        Y_training_set = Y_training_set.rename(Y_column_name, axis='columns')
+        X_training_set = training_set.drop(Y_column_name, axis=1)
+        return Y_test_set, X_test_set, Y_training_set, X_training_set
 
 
 # groups are considered as follows:
@@ -104,23 +136,3 @@ def scale(data, features):
         data = data.drop(feature, axis=1)
         data[feature] = new_array
     return data
-
-
-try:
-    dataset = load_data('Absenteeism_at_work.csv')
-    print(dataset)
-    dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 5, 10])
-    print(dataset)
-    dataset = scale(dataset, dataset.keys())
-    print(dataset)
-    dataset = load_data('Absenteeism_at_work.csv')
-    dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 5, 10])
-    dataset = normalize(dataset, dataset.keys())
-    print(dataset)
-    dataset = load_data('Absenteeism_at_work.csv')
-    dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 5, 10])
-    dataset = normalize_z_score(dataset, dataset.keys())
-    print(dataset)
-except Exception as inst:
-    print(type(inst))
-    print('Error has occured: ' + inst.args)
