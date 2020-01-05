@@ -18,8 +18,8 @@ def load_data(file):
 def my_pearsonr(x,y):
     mean_x = np.mean(x)
     mean_y = np.mean(y)
-    numerator=np.sum((x-mean_x)*(y-mean_y))
-    denominator=(np.sum((x-mean_x)**2) * np.sum((y-mean_y)**2))**0.5
+    numerator = np.sum((x-mean_x)*(y-mean_y))
+    denominator = (np.sum((x-mean_x)**2) * np.sum((y-mean_y)**2))**0.5
     return numerator / denominator, None
 
 
@@ -86,7 +86,7 @@ def principle_component_analysis(data, threshold=0.9):
     K = 1
     while True:
         preserve = np.sum(S[0:K]) / np.sum(S)
-        if (preserve >= threshold):
+        if preserve >= threshold:
             break
         K += 1
 
@@ -226,3 +226,91 @@ def scale(data, features):
         data = data.drop(feature, axis=1)
         data[feature] = new_array
     return data
+
+
+# Indexes for vertical are the actual, indexes for horizontal are the predicted
+def confusion_matrix(y_actual, y_predict, full_target_column):
+    classes = np.unique(full_target_column)
+    conf_matrix = pd.DataFrame(columns=classes, index=classes)
+    conf_matrix.fillna(0, inplace=True)
+    for index, row in conf_matrix.iterrows():
+        i = 0
+        for y in y_actual:
+            if y == index:
+                conf_matrix[y_predict[i]][index] = conf_matrix[y_predict[i]][index] + 1
+            i += 1
+    return conf_matrix
+
+
+def accuracy(y_actual, y_predict, full_target_column):
+    conf_matrix = confusion_matrix(y_actual, y_predict, full_target_column)
+    total = 0
+    good = 0
+    for index, row in conf_matrix.iterrows():
+        conf_matrix_row = conf_matrix.xs(index)
+        i = 0
+        for column in conf_matrix_row:
+            total += column
+            if index == i:
+                good += column
+            i += 1
+    return good/total
+
+
+def precision(y_actual, y_predict, full_target_column):
+    conf_matrix = confusion_matrix(y_actual, y_predict, full_target_column)
+    numerator = 0
+    for column in range(0, len(conf_matrix)):
+        true_pos = 0
+        denominator = 0
+        for row in range(0, len(conf_matrix)):
+            denominator += conf_matrix[column][row]
+            if row == column:
+                true_pos += conf_matrix[column][row]
+        numerator = numerator + (true_pos/denominator)
+
+    return numerator/len(conf_matrix)
+
+
+def recall(y_actual, y_predict, full_target_column):
+    conf_matrix = confusion_matrix(y_actual, y_predict, full_target_column)
+    numerator = 0
+    for row in range(0, len(conf_matrix)):
+        true_pos = 0
+        denominator = 0
+        for column in range(0, len(conf_matrix)):
+            denominator += conf_matrix[column][row]
+            if column == row:
+                true_pos += conf_matrix[column][row]
+        numerator = numerator + (true_pos/denominator)
+
+    return numerator/len(conf_matrix)
+
+
+def f1_score(y_actual, y_predict, full_target_column):
+    conf_matrix = confusion_matrix(y_actual, y_predict, full_target_column)
+    prec = [0.0]*len(conf_matrix)
+    rec = [0.0]*len(conf_matrix)
+    numerator = 0
+    for column in range(0, len(conf_matrix)):
+        true_pos = 0
+        denominator = 0
+        for row in range(0, len(conf_matrix)):
+            denominator += conf_matrix[column][row]
+            if row == column:
+                true_pos += conf_matrix[column][row]
+        prec[column] = (true_pos/denominator)
+
+    for row in range(0, len(conf_matrix)):
+        true_pos = 0
+        denominator = 0
+        for column in range(0, len(conf_matrix)):
+            denominator += conf_matrix[column][row]
+            if column == row:
+                true_pos += conf_matrix[column][row]
+        rec[row] = (true_pos/denominator)
+
+    for i in range(0, len(prec)):
+        numerator = numerator+(2*((prec[i]*rec[i])/(prec[i]+rec[i])))
+
+    return numerator/len(prec)
