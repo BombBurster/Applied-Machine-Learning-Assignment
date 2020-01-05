@@ -15,7 +15,6 @@ try:
     dataset = column_to_categorical(dataset, 'Distance from Residence to Work', [20, 40])
     dataset = column_to_categorical(dataset, 'Age', [35, 45])
     dataset = column_to_categorical(dataset, 'Body mass index', [18.5, 25, 30])
-    dataset = column_to_categorical(dataset, 'Age', [35, 45])
     dataset = feature_selection(dataset, 0.6)
     print(dataset)
     dataset = principle_component_analysis(dataset, 0.9)
