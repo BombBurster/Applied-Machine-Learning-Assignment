@@ -10,9 +10,16 @@ try:
     # feature selection, pca, normalization and scaling
     dataset = load_data(path+'Absenteeism_at_work.csv')
     print(dataset)
-    dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 5, 10])
+    dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 10])
+    dataset = column_to_categorical(dataset, 'Transportation expense', [200, 300])
+    dataset = column_to_categorical(dataset, 'Distance from Residence to Work', [20, 40])
+    dataset = column_to_categorical(dataset, 'Age', [35, 45])
+    dataset = column_to_categorical(dataset, 'Body mass index', [18.5, 25, 30])
+    dataset = column_to_categorical(dataset, 'Age', [35, 45])
     dataset = feature_selection(dataset, 0.6)
+    print(dataset)
     dataset = principle_component_analysis(dataset, 0.9)
+    print(dataset)
     dataset = normalize(dataset, dataset.keys())
     dataset = scale(dataset, dataset.keys())
 
