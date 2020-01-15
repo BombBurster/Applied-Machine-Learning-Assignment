@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import string
 import random
+import statistics
 # import matplotlib.pyplot as plt
 # import seaborn as sns
 # from scipy.stats import pearsonr
@@ -259,7 +260,7 @@ def accuracy(y_actual, y_predict, full_target_column):
 
 def precision(y_actual, y_predict, full_target_column):
     conf_matrix = confusion_matrix(y_actual, y_predict, full_target_column)
-    numerator = 0
+    numerator = [0.0]*len(conf_matrix)
     for column in range(0, len(conf_matrix)):
         true_pos = 0
         denominator = 0
@@ -267,14 +268,18 @@ def precision(y_actual, y_predict, full_target_column):
             denominator += conf_matrix[column][row]
             if row == column:
                 true_pos += conf_matrix[column][row]
-        numerator = numerator + (true_pos/denominator)
+        if denominator != 0:
+            numerator[column] = (true_pos/denominator)
+        else:
+            numerator[column] = 'nan'
 
-    return numerator/len(conf_matrix)
+    cleaned_numer = [numer for numer in numerator if str(numer) != 'nan']
+    return sum(cleaned_numer)/len(cleaned_numer)
 
 
 def recall(y_actual, y_predict, full_target_column):
     conf_matrix = confusion_matrix(y_actual, y_predict, full_target_column)
-    numerator = 0
+    numerator = [0.0]*len(conf_matrix)
     for row in range(0, len(conf_matrix)):
         true_pos = 0
         denominator = 0
@@ -282,16 +287,20 @@ def recall(y_actual, y_predict, full_target_column):
             denominator += conf_matrix[column][row]
             if column == row:
                 true_pos += conf_matrix[column][row]
-        numerator = numerator + (true_pos/denominator)
+        if denominator != 0:
+            numerator[row] = (true_pos/denominator)
+        else:
+            numerator[row] = 'nan'
 
-    return numerator/len(conf_matrix)
+    cleaned_numer = [numer for numer in numerator if str(numer) != 'nan']
+    return sum(cleaned_numer) / len(cleaned_numer)
 
 
 def f1_score(y_actual, y_predict, full_target_column):
     conf_matrix = confusion_matrix(y_actual, y_predict, full_target_column)
     prec = [0.0]*len(conf_matrix)
     rec = [0.0]*len(conf_matrix)
-    numerator = 0
+    numerator = [0.0]*len(conf_matrix)
     for column in range(0, len(conf_matrix)):
         true_pos = 0
         denominator = 0
@@ -299,7 +308,10 @@ def f1_score(y_actual, y_predict, full_target_column):
             denominator += conf_matrix[column][row]
             if row == column:
                 true_pos += conf_matrix[column][row]
-        prec[column] = (true_pos/denominator)
+        if denominator != 0:
+            prec[column] = (true_pos/denominator)
+        else:
+            prec[column] = 'nan'
 
     for row in range(0, len(conf_matrix)):
         true_pos = 0
@@ -308,12 +320,21 @@ def f1_score(y_actual, y_predict, full_target_column):
             denominator += conf_matrix[column][row]
             if column == row:
                 true_pos += conf_matrix[column][row]
-        rec[row] = (true_pos/denominator)
+        if denominator != 0:
+            rec[row] = (true_pos/denominator)
+        else:
+            rec[row] = 'nan'
 
     for i in range(0, len(prec)):
-        numerator = numerator+(2*((prec[i]*rec[i])/(prec[i]+rec[i])))
+        if prec[i] == 'nan' and rec[i]== 'nan':
+            numerator[i] = 'nan'
+        else:
+            numerator[i] = (2*((prec[i]*rec[i])/(prec[i]+rec[i])))
 
-    return numerator/len(prec)
+    # return sum(numerator) / len(numerator)
+    cleaned_numer = [numer for numer in numerator if str(numer) != 'nan']
+    return sum(cleaned_numer) / len(cleaned_numer)
+
 
 def cross_validation(Classifier, n_folds, data, target_name): # parameters_fit={}
     Y = data[target_name]
