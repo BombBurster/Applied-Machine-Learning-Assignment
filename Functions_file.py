@@ -314,3 +314,42 @@ def f1_score(y_actual, y_predict, full_target_column):
         numerator = numerator+(2*((prec[i]*rec[i])/(prec[i]+rec[i])))
 
     return numerator/len(prec)
+
+def cross_validation(Classifier, n_folds, data, target_name): # parameters_fit={}
+    Y = data[target_name]
+    models = [Classifier]*n_folds
+    accuracies = [0.0]*n_folds
+    precisions = [0.0]*n_folds
+    recalls = [0.0]*n_folds
+    f1_scores = [0.0]*n_folds
+    for i in range(0, n_folds):
+        Y_test, X_test, Y_train, X_train = split_data(0.8, data, target_name)
+        models[i] = models[i].fit(X_train, Y_train)
+        Y_pred = models[i].predict(X_test)
+        accuracies[i] = accuracy(Y_test, Y_pred, Y)
+        precisions[i] = precision(Y_test, Y_pred, Y)
+        recalls[i] = recall(Y_test, Y_pred, Y)
+        f1_scores[i] = f1_score(Y_test, Y_pred, Y)
+        print(confusion_matrix(Y_test, Y_pred, Y))
+
+    cleaned_prec = [prec for prec in precisions if str(prec) != 'nan']
+    cleaned_rec = [rec for rec in recalls if str(rec) != 'nan']
+    cleaned_f1_score = [f1 for f1 in f1_scores if str(f1) != 'nan']
+
+    # if np.isnan(accuracies):
+    #     mean_acc = statistics.mean(accuracies)
+    # else:
+    #     mean_acc = 'nan'
+    # if np.isnan(cleaned_prec):
+    #     mean_prec = statistics.mean(cleaned_prec)
+    # else:
+    #     mean_prec = 'nan'
+    # if np.isnan(cleaned_rec):
+    #     mean_rec = statistics.mean(cleaned_rec)
+    # else:
+    #     mean_rec = 'nan'
+    # if np.isnan(cleaned_f1_score):
+    #     mean_f1_score = statistics.mean(cleaned_f1_score)
+    # else:
+    #     mean_f1_score = 'nan'
+    return statistics.mean(accuracies), statistics.mean(cleaned_prec), statistics.mean(cleaned_rec), statistics.mean(cleaned_f1_score)

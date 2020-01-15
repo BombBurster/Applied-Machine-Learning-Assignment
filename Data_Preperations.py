@@ -10,7 +10,7 @@ try:
     # feature selection, pca, normalization and scaling
     dataset = load_data(path+'Absenteeism_at_work.csv')
     print(dataset)
-    dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 10])
+    dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 10])  # 5, 10
     # dataset = column_to_categorical(dataset, 'Transportation expense', [200, 300])
     # dataset = column_to_categorical(dataset, 'Distance from Residence to Work', [20, 40])
     # dataset = column_to_categorical(dataset, 'Age', [35, 45])
