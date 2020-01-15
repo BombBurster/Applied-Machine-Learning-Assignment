@@ -383,13 +383,13 @@ def cross_validation_RF_1(Classifier, n_folds, data, target_name): # parameters_
     recalls = [0.0]*n_folds
     f1_scores = [0.0]*n_folds
     for i in range(0, n_folds):
-        Y_test, X_test, Y_train, X_train = split_data(0.8, data, target_name)
-        models[i].fit(X_train)
-        # test, train = split_data(0.8, data)
-        # models[i].fit(train)  # models[i] =
-        # X_test = test.drop(target_name, axis=1)
-        # Y_test = test[target_name]
-        # print(X_test)
+        # Y_test, X_test, Y_train, X_train = split_data(0.8, data, target_name)
+        # models[i].fit(X_train)
+        test, train = split_data(0.8, data)
+        models[i].fit(train)  # models[i] =
+        X_test = test.drop(target_name, axis=1)
+        Y_test = test[target_name]
+        print(X_test)
         Y_pred = models[i].predict(X_test)
         accuracies[i] = accuracy(Y_test, Y_pred, Y)
         precisions[i] = precision(Y_test, Y_pred, Y)
