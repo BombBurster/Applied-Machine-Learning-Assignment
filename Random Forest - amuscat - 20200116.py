@@ -4,10 +4,8 @@ import pandas as pd
 import random
 from sklearn.metrics import r2_score
 
-#Load the dataset and seperate the target colum
+#Load the dataset
 df = pd.read_csv('Absenteeism/Absenteeism_at_work.csv', delimiter=';')
-#df = pd.read_csv('Absenteeism/Absenteeism_at_work_editted.csv')
-#df = df.iloc[:20,:]
 
 class DecisionTreeRegressor:
     def __init__(self, min_rows=5):
