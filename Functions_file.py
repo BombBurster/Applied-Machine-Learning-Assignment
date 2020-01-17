@@ -79,7 +79,7 @@ def principle_component_analysis(data, threshold=0.9):
 
     # transpose the normalized data and comput the covariance matrix
     X_t = normalized_data.T
-    covariance_matrix = my_cov(data, X_t)
+    covariance_matrix = my_cov(data, X_t) #normalized_data
 
     # Compute the Eigen values and vectors
     U, S, V = np.linalg.svd(covariance_matrix)
