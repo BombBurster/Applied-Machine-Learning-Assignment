@@ -357,22 +357,6 @@ def cross_validation(Classifier, n_folds, data, target_name): # parameters_fit={
     cleaned_rec = [rec for rec in recalls if str(rec) != 'nan']
     cleaned_f1_score = [f1 for f1 in f1_scores if str(f1) != 'nan']
 
-    # if np.isnan(accuracies):
-    #     mean_acc = statistics.mean(accuracies)
-    # else:
-    #     mean_acc = 'nan'
-    # if np.isnan(cleaned_prec):
-    #     mean_prec = statistics.mean(cleaned_prec)
-    # else:
-    #     mean_prec = 'nan'
-    # if np.isnan(cleaned_rec):
-    #     mean_rec = statistics.mean(cleaned_rec)
-    # else:
-    #     mean_rec = 'nan'
-    # if np.isnan(cleaned_f1_score):
-    #     mean_f1_score = statistics.mean(cleaned_f1_score)
-    # else:
-    #     mean_f1_score = 'nan'
     return statistics.mean(accuracies), statistics.mean(cleaned_prec), statistics.mean(cleaned_rec), statistics.mean(cleaned_f1_score)
 
 def cross_validation_RF_1(Classifier, n_folds, data, target_name): # parameters_fit={}
@@ -389,8 +373,8 @@ def cross_validation_RF_1(Classifier, n_folds, data, target_name): # parameters_
         models[i].fit(train)  # models[i] =
         X_test = test.drop(target_name, axis=1)
         Y_test = test[target_name]
-        print(X_test)
-        Y_pred = models[i].predict(X_test)
+        Y_pred = models[i].predict(test)
+        # print(Y_pred)
         accuracies[i] = accuracy(Y_test, Y_pred, Y)
         precisions[i] = precision(Y_test, Y_pred, Y)
         recalls[i] = recall(Y_test, Y_pred, Y)
@@ -401,20 +385,4 @@ def cross_validation_RF_1(Classifier, n_folds, data, target_name): # parameters_
     cleaned_rec = [rec for rec in recalls if str(rec) != 'nan']
     cleaned_f1_score = [f1 for f1 in f1_scores if str(f1) != 'nan']
 
-    # if np.isnan(accuracies):
-    #     mean_acc = statistics.mean(accuracies)
-    # else:
-    #     mean_acc = 'nan'
-    # if np.isnan(cleaned_prec):
-    #     mean_prec = statistics.mean(cleaned_prec)
-    # else:
-    #     mean_prec = 'nan'
-    # if np.isnan(cleaned_rec):
-    #     mean_rec = statistics.mean(cleaned_rec)
-    # else:
-    #     mean_rec = 'nan'
-    # if np.isnan(cleaned_f1_score):
-    #     mean_f1_score = statistics.mean(cleaned_f1_score)
-    # else:
-    #     mean_f1_score = 'nan'
     return statistics.mean(accuracies), statistics.mean(cleaned_prec), statistics.mean(cleaned_rec), statistics.mean(cleaned_f1_score)

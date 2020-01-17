@@ -1,8 +1,26 @@
 import numpy as np
 import matplotlib.pyplot as plt
-#Prevent scientific notation
-np.set_printoptions(suppress=True)
 import pandas as pd
+import random
+from sklearn.metrics import r2_score
+
+
+def get_output_result(array, len_internal_array):
+    answer = []
+    for i in range(0, len_internal_array):
+        predicted_values = []
+        for row in array:
+            predicted_values.append(row[i])
+
+        # print(predicted_values)
+        values, freq = np.unique(predicted_values, return_counts=True)
+        # print(values)
+        # print(freq)
+        index = np.where(freq == np.amax(freq))
+        answer.extend(values[index])
+        # print(answer)
+
+    return answer
 
 
 class DecisionTreeRegressor:
@@ -76,13 +94,17 @@ class DecisionTreeRegressor:
         self.nodes = node
         return node
 
-    def predict(self, X):
+    def predict(self, frame):
         y_pred = []
-        for i in range(X.shape[0]):
-            y_pred.append(self._run_tree(self.nodes, X.iloc[i, :]))  # changed was df.iloc[i, :]
+        for i in range(frame.shape[0]):
+            # Leave the target (last column) out
+            y_pred.append(self._run_tree(self.nodes, frame.iloc[i, :-1]))
+
+        # print(y_pred)
+        y_pred = np.round(y_pred, decimals=0, out=None)
         return np.array(y_pred, dtype=np.int64)
 
-    def _run_tree(self, node, x):
+    def _run_tree(self, node, frame):
         feature = node['feature']
         name = node['name']
         cutoff = node['cutoff']
@@ -91,16 +113,86 @@ class DecisionTreeRegressor:
         right_node = node['right_node']
         if left_node == {None} and right_node == {None}:
             return value
-        if x[name] > cutoff:
+        if frame[name] > cutoff:
             if right_node == {None}:
                 return value
             else:
-                return self._run_tree(right_node, x)
+                return self._run_tree(right_node, frame)
         else:
             if left_node == {None}:
                 return value
             else:
-                return self._run_tree(left_node, x)
+                return self._run_tree(left_node, frame)
 
     def get_nodes(self):
         return self.nodes
+
+
+class RandomForestRegressor():
+    def __init__(self, n_estimators=1000, random_state=0, bag_features=4):
+        self.n_estimators = n_estimators
+        np.random.RandomState = random_state
+        self.bag_features = bag_features
+
+    def _bootstrapX(self, X):
+        bx = []
+        bX = []
+        for i in range(X.shape[0]):
+            b = X.iloc[np.random.randint(X.shape[0]), :]
+            bX.append(b)
+        return pd.DataFrame(bX)
+
+    def _bagX(self, X):
+        # Do not select target column
+        num_cols = X.shape[1]
+        columns = random.sample(range(num_cols - 1), self.bag_features)
+        # re-append target column
+        columns.append(num_cols - 1)
+        return X.iloc[:, columns]
+
+    def fit(self, frame):
+        self.trees = []
+        for i in range(self.n_estimators):
+            # print(i)
+            bootstrapX = self._bootstrapX(frame)
+            bagX = self._bagX(bootstrapX)
+            # print(bagX)
+            try:
+                tree = DecisionTreeRegressor()
+                tree.fit(bagX)
+                self.trees.append(tree)
+            except:
+                pass
+        print ('Trees generated: ' + str(len(self.trees)))
+        return
+
+    def predict(self, frame):
+        y_preds = []
+        len_int_array = 0
+        models = [dt for dt in self.trees]
+        nodes = [model.get_nodes() for model in models]
+        for model in models:
+            y_pred = model.predict(frame)  # was df
+            len_int_array = len(y_pred)
+            y_preds.append(y_pred)
+        # print(y_preds)
+
+        # mean_y_preds = np.mean(y_preds, axis=0) #, dtype=np.int64
+        # print(mean_y_preds)
+        # mean_y_preds = np.round(mean_y_preds, decimals=0, out=None)
+        # mean_y_preds = mean_y_preds.astype(dtype=np.int64)
+
+        # values, freq = np.unique(y_preds, return_index=True, axis=0)
+        # print(values)
+        # print(freq)
+        # # Get the indices of maximum element in numpy array
+        # result = np.where(freq == np.amax(freq))
+        # y_actual_preds.append(values[result])
+        # print(y_actual_preds)
+
+        y_actual_preds = get_output_result(y_preds, len_int_array)
+        # print(y_actual_preds)
+        return y_actual_preds  # mean_y_preds
+
+    def get_trees(self):
+        return self.trees
