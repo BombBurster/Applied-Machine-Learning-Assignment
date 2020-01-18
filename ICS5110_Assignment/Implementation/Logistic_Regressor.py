@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import random
 
 
-# Logistic Regressor Model
+# Logistic Regression Model
 class LogisticRegressor:
 
     # Initialise hyperparameters
@@ -68,35 +68,28 @@ class LogisticRegressorOneVsAll:
         self.learning_rate = lr
         self.max_iter = max_iter
         self.add_intercept = add_intercept
-        # self.y_1vsall = []
-        # self.nb_classes = 3
 
     # Train the model
     def fit(self, X, y):
-        self.regressors = []
-
-        # # For each possible class
-        # for c in range(self.nb_classes):
-        #     y_one = np.where(y == c, 1, 0)
-        #     self.y_1vsall.append(y_one)
-
+        self.classifiers = []
+        
         # For each "one vs. all" target set
         for y_one in y:
             # Build a model with target set
             model = LogisticRegressor(lr=self.learning_rate,
                                       max_iter=self.max_iter,
                                       add_intercept=self.add_intercept)
-            # Train a model and add it to the list of regressors
+            # Train a model and add it to the list of classifiers
             model.fit(X, y_one)
-            self.regressors.append(model)
+            self.classifiers.append(model)
 
     # Predict an output
     def predict(self, X):
         final_pred = []
         y_pred_1vsall = []
 
-        # For each regressor
-        for model in self.regressors:
+        # For each classifier
+        for model in self.classifiers:
             y_pred = model.predict(X)  # was X_test
             y_pred_1vsall.append(y_pred)
 
@@ -105,7 +98,7 @@ class LogisticRegressorOneVsAll:
             best_pred = 0
             best_target = -1
             # Find the best prediction (model with highest probability)
-            for j in range(len(self.regressors)):
+            for j in range(len(self.classifiers)):
                 if y_pred_1vsall[j][i] > best_pred:
                     best_pred = y_pred_1vsall[j][i]
                     best_target = j
