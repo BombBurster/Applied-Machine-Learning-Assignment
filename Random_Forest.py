@@ -5,6 +5,7 @@ import random
 from sklearn.metrics import r2_score
 
 
+# to get the output for the predict function
 def get_output_result(array, len_internal_array):
     answer = []
     for i in range(0, len_internal_array):
@@ -12,13 +13,9 @@ def get_output_result(array, len_internal_array):
         for row in array:
             predicted_values.append(row[i])
 
-        # print(predicted_values)
         values, freq = np.unique(predicted_values, return_counts=True)
-        # print(values)
-        # print(freq)
         index = np.where(freq == np.amax(freq))
         answer.extend(values[index])
-        # print(answer)
 
     return answer
 
