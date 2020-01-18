@@ -459,7 +459,7 @@ def cross_validation(Classifier, n_folds, data, target_name):
         precisions[i] = precision(Y_test, Y_pred, Y)
         recalls[i] = recall(Y_test, Y_pred, Y)
         f1_scores[i] = f1_score(Y_test, Y_pred, Y)
-        print(confusion_matrix(Y_test, Y_pred, Y))
+        # print(confusion_matrix(Y_test, Y_pred, Y))
 
     # clean precision, recall and f1_score lists from 'nan' values
     cleaned_prec = [prec for prec in precisions if str(prec) != 'nan']
@@ -495,7 +495,7 @@ def cross_validation_RF_1(Classifier, n_folds, data, target_name):
         precisions[i] = precision(Y_test, Y_pred, Y)
         recalls[i] = recall(Y_test, Y_pred, Y)
         f1_scores[i] = f1_score(Y_test, Y_pred, Y)
-        print(confusion_matrix(Y_test, Y_pred, Y))
+        # print(confusion_matrix(Y_test, Y_pred, Y))
 
     # clean precision, recall and f1_score lists from 'nan' values
     cleaned_prec = [prec for prec in precisions if str(prec) != 'nan']
@@ -538,7 +538,7 @@ def cross_validation_log_1(Classifier, n_folds, data, target_name):
         precisions[i] = precision(Y_test, Y_pred, Y)
         recalls[i] = recall(Y_test, Y_pred, Y)
         f1_scores[i] = f1_score(Y_test, Y_pred, Y)
-        print(confusion_matrix(Y_test, Y_pred, Y))
+        # print(confusion_matrix(Y_test, Y_pred, Y))
 
     # clean precision, recall and f1_score lists from 'nan' values
     cleaned_prec = [prec for prec in precisions if str(prec) != 'nan']

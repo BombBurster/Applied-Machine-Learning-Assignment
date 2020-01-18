@@ -7,7 +7,7 @@ path = "./Absenteeism/"
 
 
 try:
-    # load daraset
+    # load dataset
     dataset = load_data(path+'Absenteeism_at_work.csv')
     # make the output column categorical
     dataset = column_to_categorical(dataset, 'Absenteeism time in hours', [0, 10])
@@ -19,7 +19,7 @@ try:
     columns = dataset.keys()
     columns = columns.delete(len(columns)-1)
     # normalize all features except for the column
-    dataset = normalize(dataset, columns)
+    dataset = normalize_z_score(dataset, columns)
     # rescale all featuers except for the column
     dataset = scale(dataset, columns)
     # add the target back into the now normalized, scaled, and reduced dimensionality dataset
